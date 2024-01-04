@@ -1,0 +1,59 @@
+plugins {
+    id("com.github.johnrengelman.shadow") version "7.1.2"
+    id("io.micronaut.application") version "3.7.10"
+
+    id 'com.google.cloud.tools.jib' version '3.4.0'
+}
+
+group = "com.example"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    annotationProcessor("io.micronaut:micronaut-http-validation")
+    implementation("io.micronaut:micronaut-http-client")
+    implementation("jakarta.annotation:jakarta.annotation-api")
+    implementation("io.micronaut:micronaut-inject:3.10.1")
+}
+
+application {
+    mainClass.set("com.example.Application")
+}
+
+shadowJar {
+    mergeServiceFiles()
+}
+
+graalvmNative.toolchainDetection = false
+micronaut {
+    runtime("netty")
+    testRuntime("junit5")
+    processing {
+        incremental(true)
+        annotations("com.example.*")
+    }
+}
+
+task runDocker(type: Exec) {
+    dependsOn 'jibDockerBuild'
+
+    // GCP variant that'll use an image published (and public) on the Google Container Registry
+    //commandLine 'docker', 'run', '--env', 'MICRONAUT_ENVIRONMENTS=dev', '-p', '8080:8080', "gcr.io/$gcpProjectName/$applicationName:$version"
+
+    // Local variant
+    commandLine 'docker', 'run', '--env', 'MICRONAUT_ENVIRONMENTS=dev', '-p', '8080:8080', "$applicationName:$version"
+}
+
+// If needed - can adjust the origin image and set a target location for automated publishing
+jib {
+    //from.image = 'adoptopenjdk:11-jre-hotspot'
+
+    // This needs auth via `gcloud auth configure-docker` locally or something else in CI. Hardcoded GCP project name.
+    to.image = "gcr.io/$gcpProjectName/$applicationName:$version"
+    // `./gradlew jib` will then both build and publish the image
+
+    // TODO: Nexus publishing target variant URL & auth
+    // Interesting part will be templates with _dynamic_ pick of container registry based on Venue setup
+}

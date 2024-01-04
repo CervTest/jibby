@@ -1,0 +1,7 @@
+micronaut:
+  application:
+    name: jibby-dev
+netty:
+  default:
+    allocator:
+      max-order: 3
