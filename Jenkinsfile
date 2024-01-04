@@ -37,7 +37,7 @@ pipeline {
                 withKubeConfig(clusterName: 'ttf-cluster', contextName: 'jenkins-k8s', credentialsId: '1c00907c-98ab-4c55-bd44-7afc075d4ac8', namespace: '', restrictKubeConfigAccess: false, serverUrl: 'https://kubernetes.default') {
                     sh 'kubectl get ns'
                     //sh 'kubectl create ns jibby' // Add rerun safe logic / dynamic namespace pick
-                    //sh 'kubectl apply -f k8s/ -n jibby'
+                    sh 'kubectl apply -f k8s/ -n jibby'
                 }
             }
         }
