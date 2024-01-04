@@ -7,6 +7,10 @@ plugins {
 
 group = "com.example"
 
+ext {
+    imagePath = "gcr.io/${gcpProjectName}/${applicationName}:${version}"
+}
+
 repositories {
     mavenCentral()
 }
@@ -51,9 +55,16 @@ jib {
     //from.image = 'adoptopenjdk:11-jre-hotspot'
 
     // This needs auth via `gcloud auth configure-docker` locally or something else in CI. Hardcoded GCP project name.
-    to.image = "gcr.io/$gcpProjectName/$applicationName:$version"
+    to.image = "$imagePath"
     // `./gradlew jib` will then both build and publish the image
 
     // TODO: Nexus publishing target variant URL & auth
     // Interesting part will be templates with _dynamic_ pick of container registry based on Venue setup
+}
+
+// Does text manipulation to prepare k8s YAML files for deployment - should happen in a CD style context with no Git updates
+task prepareCD(type: Exec) {
+    //NOTE: The -i '' is for MacOS specifically, may have to remove '' for Linux
+    commandLine 'bash', '-c', "sed -i '' 's|APP_URL|${appUrl}|g' k8s/ingress.yaml"
+    commandLine 'bash', '-c', "sed -i '' 's|IMAGE_PATH|${imagePath}|g' k8s/statefulset.yaml"
 }

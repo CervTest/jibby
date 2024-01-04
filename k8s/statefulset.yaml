@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: jibby
-          image: gcr.io/proto-client-ttf-832500/micro-jibby:0.2 #TODO: Make dynamic
+          image: IMAGE_PATH
           ports:
             - containerPort: 8080
 
