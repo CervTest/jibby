@@ -65,6 +65,8 @@ jib {
 // Does text manipulation to prepare k8s YAML files for deployment - should happen in a CD style context with no Git updates
 task prepareCD(type: Exec) {
     //NOTE: The -i '' is for MacOS specifically, may have to remove '' for Linux
-    commandLine 'bash', '-c', "sed -i '' 's|APP_URL|${appUrl}|g' k8s/ingress.yaml"
-    commandLine 'bash', '-c', "sed -i '' 's|IMAGE_PATH|${imagePath}|g' k8s/statefulset.yaml"
+    commandLine 'bash', '-c', """
+        sed -i '' 's|APP_URL|${appUrl}|g' k8s/ingress.yaml &&
+        sed -i '' 's|IMAGE_PATH|${imagePath}|g' k8s/statefulset.yaml
+    """
 }
