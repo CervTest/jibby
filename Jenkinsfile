@@ -13,7 +13,7 @@ pipeline {
 
                 // Create and publish a Docker image using Jib with GCR auth present
                 withCredentials([file(credentialsId: 'gcr-service-user-proto-client-ttf', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
-                    sh './gradlew jib'
+                    sh './gradlew --console=plain jib' // Jib outputs some gibberish progress logging we skip with "plain"
                 }
 
                 // Customize Kubernetes manifests for deployment
