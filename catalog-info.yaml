@@ -4,6 +4,7 @@ metadata:
   name: jibby
   annotations:
     github.com/project-slug: CervTest/jibby
+    jenkins.io/job-full-name: "Experimental/CervTest/jibby"
 spec:
   type: other
   lifecycle: unknown
