@@ -2,9 +2,25 @@
 
 A [Micronaut](micronaut.io) + [Jib](https://github.com/GoogleContainerTools/jib) mashup with extra bells and whistles for showing some hot CI/CD action.
 
+You can try out the basic tutorial at https://codelabs.developers.google.com/codelabs/cloud-micronaut-kubernetes to see a similar but dated approach.
+
 ## Behind the scenes
 
 Some more gory details about how this template was put together
+
+### Jib
+
+In short Jib lets you automagically containerize a JVM web app through something like their [gradle plugin](https://github.com/GoogleContainerTools/jib/tree/master/jib-gradle-plugin) without having to write or maintain a Dockerfile.
+
+You can easily define what source image to use (it will otherwise default to something sensible) and what image it should produce and publish somewhere.
+
+You can see other examples of Jib in action at https://github.com/GoogleContainerTools/jib/tree/master/examples
+
+### Micronaut
+
+For complete documentation see the later section with links. For the purposes of this template a basic `/hello` endpoint is defined that will return a message to the user. Micronaut environment handling is also enabled with an extremely simple but fully functional config-derrived value being part of the returned message.
+
+By default the `application.yml` from `src/main/resources` is loaded, but you can toggle the dev environment settings by running the app with an environment variable `MICRONAUT_ENVIRONMENTS` set to `dev` to then load the `application-dev.yml` - you can make any environment you like and even activate multiple at once. See more at https://docs.micronaut.io/latest/guide/#environments
 
 ### Container Registry
 
@@ -35,8 +51,6 @@ The `mykey` parameter becomes the json file written to disk in the active direct
 - [Shadow Gradle Plugin](https://plugins.gradle.org/plugin/com.github.johnrengelman.shadow)
 - [Micronaut Gradle Plugin documentation](https://micronaut-projects.github.io/micronaut-gradle-plugin/latest/)
 - [GraalVM Gradle Plugin documentation](https://graalvm.github.io/native-build-tools/latest/gradle-plugin.html)
-## Feature http-client documentation
-
 - [Micronaut HTTP Client documentation](https://docs.micronaut.io/latest/guide/index.html#httpClient)
 
 

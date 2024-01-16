@@ -3,9 +3,8 @@ kind: Component
 metadata:
   name: jibby
   annotations:
-    github.com/project-slug: CervTest/jibby
-    jenkins.io/job-full-name: "Experimental/CervTest/jibby"
+    jenkins.io/job-full-name: Experimental/CervTest/jibby
 spec:
-  type: other
-  lifecycle: unknown
+  type: service
+  lifecycle: experimental
   owner: team-c
