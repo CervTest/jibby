@@ -24,6 +24,18 @@ pipeline {
             }
         }
 
+        
+        stage('SonarQube analysis') {
+            agent {
+                label 'java11' // Use an agent with the "java11" label
+            }
+            steps {
+                withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                    sh './gradlew sonarqube -Dsonar.token=$SONAR_TOKEN'
+                }
+            }
+        }
+
         stage('Deploy to Kubernetes') {
             agent {
                 label 'kubectl' // Use an agent with the "kubectl" label
