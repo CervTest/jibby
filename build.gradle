@@ -64,8 +64,8 @@ jib {
     to {
         image = "$imagePath"
         auth {
-            username = project.findProperty('nexusUsername') ?: System.getenv('NEXUS_USERNAME')
-            password = project.findProperty('nexusPassword') ?: System.getenv('NEXUS_PASSWORD')
+            username = System.getenv('NEXUS_USERNAME')
+            password = System.getenv('NEXUS_PASSWORD')
         }
     }
     // Interesting part will be templates with _dynamic_ pick of container registry based on Venue setup

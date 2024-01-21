@@ -7,19 +7,19 @@ pipeline {
                 label 'java11' // Use an agent with the "java11" label
             }
             steps {
+                // Nexus auth for jib, build.gradle is pointed explicitly to the Nexus env vars to find them
+                withCredentials([usernamePassword(credentialsId: 'nexus-cred', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD' )]){
+                    // Build project including tests & analytics
+                    sh './gradlew build'
+                    
+                    // Build & publish image
+                    sh './gradlew --console=plain jib' // Jib outputs some gibberish progress logging we skip with "plain"
+                }
 
-                // Build project including tests & analytics
-                sh './gradlew build'
-
-                // Create and publish a Docker image using Jib with GCR auth present
+                // GCR alternative to create and publish a Docker image using Jib with GCR auth present
                 //withCredentials([file(credentialsId: 'gcr-service-user-proto-client-ttf', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
                 //    sh './gradlew --console=plain jib' // Jib outputs some gibberish progress logging we skip with "plain"
                 //}
-
-                // Nexus variant, build.gradle is pointed explicitly to the Nexus env vars to find them
-                withCredentials([usernamePassword(credentialsId: 'nexus-cred', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD' )]){
-                    sh './gradlew --console=plain jib' // Jib outputs some gibberish progress logging we skip with "plain"
-                }
 
                 // Customize Kubernetes manifests for deployment
                 sh './gradlew prepareCD'
