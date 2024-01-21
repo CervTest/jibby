@@ -7,16 +7,16 @@ pipeline {
                 label 'java11' // Use an agent with the "java11" label
             }
             steps {
+                // Build project including tests & analytics
+                sh './gradlew build'
+
                 // Nexus auth for jib, build.gradle is pointed explicitly to the Nexus env vars to find them
                 withCredentials([usernamePassword(credentialsId: 'nexus-cred', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD' )]){
-                    // Build project including tests & analytics
-                    sh './gradlew build'
-                    
-                    // Build & publish image
+                    // Build & publish image with a valid credential set
                     sh './gradlew --console=plain jib' // Jib outputs some gibberish progress logging we skip with "plain"
                 }
 
-                // GCR alternative to create and publish a Docker image using Jib with GCR auth present
+                // GCR alternative to create and publish a Docker image using Jib with GCR auth present (magic env var)
                 //withCredentials([file(credentialsId: 'gcr-service-user-proto-client-ttf', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
                 //    sh './gradlew --console=plain jib' // Jib outputs some gibberish progress logging we skip with "plain"
                 //}
