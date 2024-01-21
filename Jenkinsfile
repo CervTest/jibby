@@ -1,15 +1,19 @@
 pipeline {
-    agent none
+    // Use a java11 agent globally as we're mostly doing Java stuff
+    agent {
+        label 'java11'
+    }
 
     stages {
-        stage('Build and Jib') {
-            agent {
-                label 'java11' // Use an agent with the "java11" label
-            }
+        stage('Build') {
             steps {
                 // Build project including tests & analytics
                 sh './gradlew build'
+            }
+        }
 
+        stage('Containerize') {
+            steps {
                 // Nexus auth for jib, build.gradle is pointed explicitly to the Nexus env vars to find them
                 withCredentials([usernamePassword(credentialsId: 'nexus-cred', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD' )]){
                     // Build & publish image with a valid credential set
@@ -20,7 +24,19 @@ pipeline {
                 //withCredentials([file(credentialsId: 'gcr-service-user-proto-client-ttf', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
                 //    sh './gradlew --console=plain jib' // Jib outputs some gibberish progress logging we skip with "plain"
                 //}
+            }
+        }
+        
+        stage('SonarQube') {
+            steps {
+                withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                    sh './gradlew sonarqube -Dsonar.token=$SONAR_TOKEN'
+                }
+            }
+        }
 
+        stage('Prep CD') {
+            steps {
                 // Customize Kubernetes manifests for deployment
                 sh './gradlew prepareCD'
 
@@ -29,24 +45,12 @@ pipeline {
             }
         }
 
-        
-        stage('SonarQube analysis') {
-            agent {
-                label 'java11' // Use an agent with the "java11" label
-            }
-            steps {
-                withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
-                    sh './gradlew sonarqube -Dsonar.token=$SONAR_TOKEN'
-                }
-            }
-        }
-
-        stage('Deploy to Kubernetes') {
+        stage('k8s deploy') {
             agent {
                 label 'kubectl' // Use an agent with the "kubectl" label
             }
             steps {
-                // On the second agent, unstash the 'k8s' directory
+                // On the special agent, unstash the 'k8s' directory
                 unstash 'k8s-stash'
                 sh 'ls -la k8s'
 
