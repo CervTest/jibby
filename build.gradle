@@ -9,7 +9,8 @@ plugins {
 group = "com.example"
 
 ext {
-    imagePath = "gcr.io/${gcpProjectName}/${applicationName}:${version}"
+    //imagePath = "gcr.io/${gcpProjectName}/${applicationName}:${version}"
+    imagePath = "docker.terasology.io/repository/docker-nexus/${applicationName}:${version}"
 }
 
 repositories {
@@ -56,10 +57,17 @@ jib {
     //from.image = 'adoptopenjdk:11-jre-hotspot'
 
     // This needs auth via `gcloud auth configure-docker` locally or something else in CI. Hardcoded GCP project name.
-    to.image = "$imagePath"
+    //to.image = "$imagePath"
     // `./gradlew jib` will then both build and publish the image
 
-    // TODO: Nexus publishing target variant URL & auth
+    // Alternative with Nexus auth
+    to {
+        image = "$imagePath"
+        auth {
+            username = System.getenv('NEXUS_USERNAME') ?: 'unset'
+            password = System.getenv('NEXUS_PASSWORD') ?: 'unset'
+        }
+    }
     // Interesting part will be templates with _dynamic_ pick of container registry based on Venue setup
 }
 
