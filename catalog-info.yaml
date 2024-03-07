@@ -7,6 +7,7 @@ metadata:
     sonarqube.org/project-key: com.venue.jibby.nojira
     jenkins.io/job-full-name: "Experimental/CervTest/jibby"
     nexus-repository-manager/docker.image-name: repository/docker-nexus/micro-jibby
+    jira/project-key: VSH # Cloud key
 spec:
   type: service
   lifecycle: experimental
